@@ -20,7 +20,8 @@
 #define HID_KEYCODE_MODIFIER_MAX 0xE7
 #define STATE_ON 0x01
 #define STATE_OFF 0x00
-#define DEBUG
+#define SCAN_RATE 15
+//#define DEBUG
 
 /* Arduino Pins */
 int muxRowControlPin[] = {2, 3, 4};
@@ -82,6 +83,8 @@ void setup()
 /* Scan Keyboard Matrix */
 void loop()
 {
+    unsigned long scanStart = millis();
+
     for (int row = 0; row < MAX_ROWS; row++) {
         for (int col = 0; col < MAX_COLS; col++) {
             readKey(row, col, currentState);
@@ -100,8 +103,12 @@ void loop()
 
     copyKeyState(currentState, prevState);
 
-    // sleep for 15 milliseconds
-    delay(15);
+    unsigned long scanEnd = millis();
+
+    // adjust scan rate to SCAN_RATE
+    if ((scanEnd - scanStart) < SCAN_RATE) {
+        delay(SCAN_RATE - (scanEnd - scanStart));
+    }
 }
 
 void initializeState(uint8_t state[MAX_ROWS][MAX_COLS])
@@ -143,7 +150,7 @@ void selectMux(int channel, int* controlPin)
     for (int i = 0; i < 3; i++) {
         digitalWrite(controlPin[i], muxChannel[channel][i]);
     }
-    delayMicroseconds(50);
+    delayMicroseconds(30);
 }
 
 void enableSelectedColumn()
@@ -155,7 +162,7 @@ void enableSelectedColumn()
 void disableSelectedColumn()
 {
     digitalWrite(enableColPin, COL_DISABLE);
-    delayMicroseconds(50);
+    delayMicroseconds(30);
 }
 
 int copyKeyState(uint8_t from[MAX_ROWS][MAX_COLS],
