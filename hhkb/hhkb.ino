@@ -185,17 +185,38 @@ int isAnyKeyPressed(uint8_t state[MAX_ROWS][MAX_COLS])
     return 0;
 }
 
-uint8_t keymapKeyToHidKeycode (int row, int col)
+uint8_t keymapKeyToHidKeycode(int row, int col)
 {
     return KEYMAP[row][col];
+}
+
+uint8_t ordinaryKeyToFnKey(int row, int col)
+{
+    if (row == 7 && col == 3) { /* [ */
+        return 0x52; /* UpArrow */
+    } else if (row == 7 && col == 4) { /* ' */
+        return 0x4F; /* RightArrow */
+    } else if (row == 7 && col == 5) { /* / */
+        return 0x51; /* DownArrow */
+    } else if (row == 6 && col == 4) { /* ; */
+        return 0x50; /* LeftArrow */
+    }
+
+    return keymapKeyToHidKeycode(row, col);
 }
 
 void sendKeyCodes(uint8_t state[MAX_ROWS][MAX_COLS])
 {
     uint8_t modifiers = 0x00;
     uint8_t keyCodes[KEY_ROLL_OVER] = {0};
+    int fnFlag = 0;
     int numOfKeyDown = 0;
     int hidKeycode;
+
+    // check FnKey(5, 4) is pressed
+    if (state[5][4] == STATE_ON) {
+        fnFlag = 1;
+    }
 
     for (int row = 0; row < MAX_ROWS; row++) {
         for (int col = 0; col < MAX_COLS; col++) {
@@ -208,7 +229,11 @@ void sendKeyCodes(uint8_t state[MAX_ROWS][MAX_COLS])
 
                 // ordinary key is pressed
                 } else if (numOfKeyDown < KEY_ROLL_OVER) {
-                    keyCodes[numOfKeyDown++] = hidKeycode;
+                    if (fnFlag) {
+                        keyCodes[numOfKeyDown++] = ordinaryKeyToFnKey(row, col);
+                    } else {
+                        keyCodes[numOfKeyDown++] = hidKeycode;
+                    }
                 }
             }
         }
