@@ -21,6 +21,7 @@
 #define STATE_ON 0x01
 #define STATE_OFF 0x00
 #define SCAN_RATE 15
+#define BT_MODE // Bluetooth Mode
 //#define DEBUG
 
 /* Arduino Pins */
@@ -59,7 +60,7 @@ uint8_t KEYMAP[MAX_ROWS][MAX_COLS] = {
 
 void setup()
 {
-    Serial.begin(9600);
+    Serial.begin(115200);
 
     // set pin mode
     for (int i = 0; i < 3; i++) {
@@ -259,6 +260,12 @@ void sendKeyCodesBySerial(uint8_t modifiers,
                           uint8_t keycode4,
                           uint8_t keycode5)
 {
+#ifdef BT_MODE
+    Serial.write(0xFD); // Raw Report Mode
+    Serial.write(0x09); // Length
+    Serial.write(0x01); // Descriptor 0x01=Keyboard
+#endif
+
     /* send key codes(8 bytes all) */
     Serial.write(modifiers); // modifier keys
     Serial.write(0x00, 1);   // reserved
