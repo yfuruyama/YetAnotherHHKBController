@@ -52,7 +52,7 @@ uint8_t KEYMAP[MAX_ROWS][MAX_COLS] = {
     {0x22/* 5 */, 0x23/* 6 */,   0x1C/* y */,      0x17/* t */,       0x0A/* g */,       0x0B/* h */,       0x11/* n */,     UNUSED}, 
     {0x1E/* 1 */, 0x29/* ESC */, 0x2B/* TAB */,    0xE0/* CONTROL */, 0xE1/* L-SHIFT */, 0xE2/* L-Alt */,   0xE3/* L-GUI */, 0x2C/* SPACE */}, 
     {0x24/* 7 */, 0x25/* 8 */,   0x18/* u */,      0x0C/* i */,       0x0E/* k */,       0x0D/* j */,       0x10/* m */,     UNUSED}, 
-    {0x31/* \ */, 0x35 /* ` */,  0x2A/* DELETE */, 0x28/* RETURN */,  UNUSED/* Fn */,    0xE5/* R-SHIFT */, 0x36/* R-Alt */, 0xE7/* R-GUI */}, 
+    {0x31/* \ */, 0x35 /* ` */,  0x2A/* DELETE */, 0x28/* RETURN */,  UNUSED/* Fn */,    0xE5/* R-SHIFT */, 0xE6/* R-Alt */, 0xE7/* R-GUI */}, 
     {0x26/* 9 */, 0x27/* 0 */,   0x12/* o */,      0x13/* p */,       0x33/* ; */,       0x0F/* l */,       0x36/* , */,     UNUSED}, 
     {0x2D/* - */, 0x2E/* = */,   0x30/* ] */,      0x2F/* [ */,       0x34/* ' */,       0x38/* / */,       0x37/* . */,     UNUSED} 
 };
