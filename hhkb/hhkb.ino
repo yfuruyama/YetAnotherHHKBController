@@ -1,12 +1,12 @@
 /*
- * Yet Another Controller for Happy Hacking Keyboard Professional2
- * This controller is designed for Arduino UNO.
+ * Yet Another Controller for Happy Hacking Keyboard Professional2.
+ * This controller is designed for Arduino.
  *
  * !DISCLAIMER!
  * This software is absolutely NOT perfect and may damage to your keyboard.
  * Please use this software only if you have mature knowledge of electronical 
  * enginnering and understand the risk of this software.
- * I'm not accountable for the damage caused by using this software.
+ * I'm not accountable for the damage or detriment caused by using this software.
  */
 
 #define KEY_ROLL_OVER 6
@@ -96,8 +96,8 @@ void loop()
     if (isAnyKeyPressed(currentState)) {
         sendKeyCodes(currentState);
 
-    // Check if some keyes were pressed previously,
-    // but no key is pressed currently
+    // Check if some keyes were pressed previously
+    // and no key is pressed currently
     } else if (isAnyKeyPressed(prevState)) {
         sendKeyCodes(zeroState);
     }
