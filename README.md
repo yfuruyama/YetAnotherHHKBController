@@ -1,7 +1,7 @@
 YetAnotherHHKBController
 =========================
 
-Yet another controller for Happy Hacking Keyboard Professional2.
+Yet another controller for Happy Hacking Keyboard Professional2.  
 This controller is designed for Arduino.
 
 !DISCLAIMER!
