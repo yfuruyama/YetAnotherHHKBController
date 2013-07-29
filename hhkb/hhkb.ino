@@ -47,7 +47,7 @@ uint8_t prevState[MAX_ROWS][MAX_COLS];
 uint8_t currentState[MAX_ROWS][MAX_COLS];
 
 /* KEYMAP KEY TO HID KEYCODE*/
-uint8_t KEYMAP[MAX_ROWS][MAX_COLS] = {
+uint8_t KEYMAP_NORMAL_MODE[MAX_ROWS][MAX_COLS] = {
     {0x1F/* 2 */, 0x14/* q */,   0x1A/* w */,      0x16/* s */,       0x04/* a */,       0x1D/* z */,       0x1B/* x */,     0x06/* c */}, 
     {0x20/* 3 */, 0x21/* 4 */,   0x15/* r */,      0x08/* e */,       0x07/* d */,       0x09/* f */,       0x19/* v */,     0x05/* b */}, 
     {0x22/* 5 */, 0x23/* 6 */,   0x1C/* y */,      0x17/* t */,       0x0A/* g */,       0x0B/* h */,       0x11/* n */,     UNUSED}, 
@@ -56,6 +56,19 @@ uint8_t KEYMAP[MAX_ROWS][MAX_COLS] = {
     {0x31/* \ */, 0x35 /* ` */,  0x2A/* DELETE */, 0x28/* RETURN */,  UNUSED/* Fn */,    0xE5/* R-SHIFT */, 0xE6/* R-Alt */, 0xE7/* R-GUI */}, 
     {0x26/* 9 */, 0x27/* 0 */,   0x12/* o */,      0x13/* p */,       0x33/* ; */,       0x0F/* l */,       0x36/* , */,     UNUSED}, 
     {0x2D/* - */, 0x2E/* = */,   0x30/* ] */,      0x2F/* [ */,       0x34/* ' */,       0x38/* / */,       0x37/* . */,     UNUSED} 
+};
+
+
+/* KEYMAP KEY TO HID KEYCODE(Function Mode)*/
+uint8_t KEYMAP_FN_MODE[MAX_ROWS][MAX_COLS] = {
+    {0x3B/* F2 */,  UNUSED,        0x52/* UpArrow */,   0x51/* DownArrow */,  0x50/* LeftArrow */,  UNUSED, UNUSED, UNUSED},
+    {0x3C/* F3 */,  0x3D/* F4 */,  UNUSED,              UNUSED,               0x4F/* RightArrow */, UNUSED, UNUSED, UNUSED},
+    {0x3E/* F5 */,  0x3F/* F6 */,  UNUSED,              UNUSED,               UNUSED,               UNUSED, UNUSED, UNUSED},
+    {0x3A/* F1 */,  UNUSED,        UNUSED,              UNUSED,               UNUSED,               UNUSED, UNUSED, UNUSED},
+    {0x40/* F7 */,  0x41/* F8 */,  UNUSED,              UNUSED,               UNUSED,               UNUSED, UNUSED, UNUSED},
+    {UNUSED,        UNUSED,        UNUSED,              UNUSED,               UNUSED,               UNUSED, UNUSED, UNUSED},
+    {0x42/* F9 */,  0x43/* F10 */, UNUSED,              UNUSED,               UNUSED,               UNUSED, UNUSED, UNUSED},
+    {0x44/* F11 */, 0x45/* F12 */, UNUSED,              UNUSED,               UNUSED,               UNUSED, UNUSED, UNUSED}
 };
 
 void setup()
@@ -188,22 +201,12 @@ int isAnyKeyPressed(uint8_t state[MAX_ROWS][MAX_COLS])
 
 uint8_t keymapKeyToHidKeycode(int row, int col)
 {
-    return KEYMAP[row][col];
+    return KEYMAP_NORMAL_MODE[row][col];
 }
 
-uint8_t ordinaryKeyToFnKey(int row, int col)
+uint8_t normalKeyToFnKey(int row, int col)
 {
-    if (row == 7 && col == 3) { /* [ */
-        return 0x52; /* UpArrow */
-    } else if (row == 7 && col == 4) { /* ' */
-        return 0x4F; /* RightArrow */
-    } else if (row == 7 && col == 5) { /* / */
-        return 0x51; /* DownArrow */
-    } else if (row == 6 && col == 4) { /* ; */
-        return 0x50; /* LeftArrow */
-    }
-
-    return keymapKeyToHidKeycode(row, col);
+    return KEYMAP_FN_MODE[row][col];
 }
 
 void sendKeyCodes(uint8_t state[MAX_ROWS][MAX_COLS])
@@ -221,8 +224,9 @@ void sendKeyCodes(uint8_t state[MAX_ROWS][MAX_COLS])
 
     for (int row = 0; row < MAX_ROWS; row++) {
         for (int col = 0; col < MAX_COLS; col++) {
-            if (state[row][col] == STATE_ON &&
-                (hidKeycode = keymapKeyToHidKeycode(row, col)) != UNUSED) {
+            if (state[row][col] == STATE_ON) {
+                hidKeycode = keymapKeyToHidKeycode(row, col);
+
                 // modifier key is pressed
                 if (HID_KEYCODE_MODIFIER_MIN <= hidKeycode && 
                     hidKeycode <= HID_KEYCODE_MODIFIER_MAX) {
@@ -231,8 +235,9 @@ void sendKeyCodes(uint8_t state[MAX_ROWS][MAX_COLS])
                 // ordinary key is pressed
                 } else if (numOfKeyDown < KEY_ROLL_OVER) {
                     if (fnFlag) {
-                        keyCodes[numOfKeyDown++] = ordinaryKeyToFnKey(row, col);
-                    } else {
+                        hidKeycode = normalKeyToFnKey(row, col);
+                    }
+                    if (hidKeycode != UNUSED) {
                         keyCodes[numOfKeyDown++] = hidKeycode;
                     }
                 }
