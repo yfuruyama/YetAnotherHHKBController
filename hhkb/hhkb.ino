@@ -164,19 +164,19 @@ void selectMux(int channel, int* controlPin)
     for (int i = 0; i < 3; i++) {
         digitalWrite(controlPin[i], muxChannel[channel][i]);
     }
-    delayMicroseconds(30);
+    delayMicroseconds(20);
 }
 
 void enableSelectedColumn()
 {
     digitalWrite(enableColPin, COL_ENABLE);
-    delayMicroseconds(3);
+    //delayMicroseconds(3);
 }
 
 void disableSelectedColumn()
 {
     digitalWrite(enableColPin, COL_DISABLE);
-    delayMicroseconds(30);
+    delayMicroseconds(10);
 }
 
 int copyKeyState(uint8_t from[MAX_ROWS][MAX_COLS],
@@ -280,7 +280,7 @@ void sendKeyCodesBySerial(uint8_t modifiers,
     Serial.write(keycode3);  // keycode3
     Serial.write(keycode4);  // keycode4
     Serial.write(keycode5);  // keycode5
-    delay(10);
+    delay(5);
 }
 
 void showSendingKeyCodes(uint8_t modifiers, uint8_t keyCodes[KEY_ROLL_OVER])
