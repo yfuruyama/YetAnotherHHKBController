@@ -8,6 +8,8 @@
  * enginnering and understand the risk of this software.
  * I'm not accountable for the damage or detriment caused by using this software.
  */
+#include <avr/sleep.h>
+#include <avr/power.h>
 
 #define KEY_ROLL_OVER 6
 #define MAX_ROWS 8
@@ -71,6 +73,16 @@ uint8_t KEYMAP_FN_MODE[MAX_ROWS][MAX_COLS] = {
     {0x44/* F11 */, 0x45/* F12 */, UNUSED,              UNUSED,               UNUSED,               UNUSED, UNUSED, UNUSED}
 };
 
+int isSleeping = 0;
+
+ISR(TIMER2_OVF_vect)
+{
+  /* set the flag. */
+   if (isSleeping == 1) {
+     isSleeping = 0;
+   }
+}
+
 void setup()
 {
     Serial.begin(115200);
@@ -92,6 +104,16 @@ void setup()
 
     initializeState(prevState);
     initializeState(currentState);
+
+    // setup timer interrupt
+    cli();
+    TCCR2A = 0x00;
+    TCCR2B = 0x00;
+
+    TCNT2 = 0x00; 
+    TCCR2B |= 0x06;
+    TIMSK2 = (1 << TOIE2);
+    sei();
 }
 
 /* Scan Keyboard Matrix */
@@ -121,8 +143,19 @@ void loop()
 
     // adjust scan rate to SCAN_RATE
     if ((scanEnd - scanStart) < SCAN_RATE) {
-        delay(SCAN_RATE - (scanEnd - scanStart));
+        /* delay(SCAN_RATE - (scanEnd - scanStart)); */
+        enterSleep();
     }
+}
+
+void enterSleep()
+{
+    isSleeping = 1;
+    TCNT2 = 0x00; 
+    set_sleep_mode(SLEEP_MODE_PWR_SAVE);
+    sleep_enable();
+    sleep_mode();
+    sleep_disable();
 }
 
 void initializeState(uint8_t state[MAX_ROWS][MAX_COLS])
@@ -164,7 +197,7 @@ void selectMux(int channel, int* controlPin)
     for (int i = 0; i < 3; i++) {
         digitalWrite(controlPin[i], muxChannel[channel][i]);
     }
-    delayMicroseconds(20);
+    delayMicroseconds(15);
 }
 
 void enableSelectedColumn()
@@ -176,7 +209,7 @@ void enableSelectedColumn()
 void disableSelectedColumn()
 {
     digitalWrite(enableColPin, COL_DISABLE);
-    delayMicroseconds(10);
+    delayMicroseconds(5);
 }
 
 int copyKeyState(uint8_t from[MAX_ROWS][MAX_COLS],
