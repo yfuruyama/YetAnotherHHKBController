@@ -4,6 +4,8 @@ YetAnotherHHKBController
 Yet another controller for Happy Hacking Keyboard Professional2.  
 This controller is designed for Arduino.
 
+![screenshot](https://raw.github.com/addsict/YetAnotherHHKBController/master/img/hhkb_arduino.png)
+
 !DISCLAIMER!
 ---------------
 This software is absolutely NOT perfect and may damage to your keyboard.  
