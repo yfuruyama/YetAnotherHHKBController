@@ -63,14 +63,14 @@ uint8_t KEYMAP_NORMAL_MODE[MAX_ROWS][MAX_COLS] = {
 
 /* KEYMAP KEY TO HID KEYCODE(Function Mode)*/
 uint8_t KEYMAP_FN_MODE[MAX_ROWS][MAX_COLS] = {
-    {0x3B/* F2 */,  UNUSED,				UNUSED,					0x80/* Vol Up */,	  0x81/* Vol Dn */,		UNUSED,				 UNUSED,		 UNUSED},
-	{0x3C/* F3 */,  0x3D/* F4 */,		UNUSED,					UNUSED,               0x7F/* Mute */,		UNUSED,				 UNUSED,		 UNUSED},
-	{0x3E/* F5 */,  0x3F/* F6 */,		UNUSED,					UNUSED,               UNUSED,               UNUSED,				 UNUSED,		 UNUSED},
-	{0x3A/* F1 */,  0x66/* Power */,	0x39/* CapsLck*/,		UNUSED,               UNUSED,               UNUSED,				 UNUSED,		 UNUSED},
-	{0x40/* F7 */,  0x41/* F8 */,		UNUSED,					0x46/* PSc/SQq */,    0x4A/* Home */,		UNUSED,				 UNUSED,		 UNUSED},
-	{0x49/* Ins */, 0x4C/* (Del) */,	0x2A/* DELETE */,		0x28/* RETURN */,     UNUSED,               UNUSED,				 UNUSED,		 0x78/* Stop */},
-	{0x42/* F9 */,  0x43/* F10 */,		0x47/* ScrLk */,		0x48/* Pus/Brk */,	  0x50/* LeftArrow */,  0x4B/* PgUp */,		 0x4D/* End */,  UNUSED},
-	{0x44/* F11 */, 0x45/* F12 */,		UNUSED,					0x52/* UpArrow */,    0x4F/* RightArrow */, 0x51/* DownArrow */, 0x4E/* PgDn */, UNUSED}
+    {0x3B/* F2 */,  UNUSED,            UNUSED,            0x80/* Vol Up */,   0x81/* Vol Dn */,      UNUSED,              UNUSED,         UNUSED},
+    {0x3C/* F3 */,  0x3D/* F4 */,      UNUSED,            UNUSED,             0x7F/* Mute */,        UNUSED,              UNUSED,         UNUSED},
+    {0x3E/* F5 */,  0x3F/* F6 */,      UNUSED,            UNUSED,             UNUSED,                UNUSED,              UNUSED,         UNUSED},
+    {0x3A/* F1 */,  0x66/* Power */,   0x39/* CapsLck*/,  UNUSED,             UNUSED,                UNUSED,              UNUSED,         UNUSED},
+    {0x40/* F7 */,  0x41/* F8 */,      UNUSED,            0x46/* PSc/SQq */,  0x4A/* Home */,        UNUSED,              UNUSED,         UNUSED},
+    {0x49/* Ins */, 0x4C/* (Del) */,   0x2A/* DELETE */,  0x28/* RETURN */,   UNUSED,                UNUSED,              UNUSED,         0x78/* Stop */},
+    {0x42/* F9 */,  0x43/* F10 */,     0x47/* ScrLk */,   0x48/* Pus/Brk */,  0x50/* LeftArrow */,   0x4B/* PgUp */,      0x4D/* End */,  UNUSED},
+    {0x44/* F11 */, 0x45/* F12 */,     UNUSED,            0x52/* UpArrow */,  0x4F/* RightArrow */,  0x51/* DownArrow */, 0x4E/* PgDn */, UNUSED}
 };
 
 int isSleeping = 0;
