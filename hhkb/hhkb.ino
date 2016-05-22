@@ -47,6 +47,8 @@ int muxChannel[8][3] = {
 uint8_t zeroState[MAX_ROWS][MAX_COLS] = {0};
 uint8_t prevState[MAX_ROWS][MAX_COLS];
 uint8_t currentState[MAX_ROWS][MAX_COLS];
+int isPrevStatePressed;
+int isCurrentStatePressed;
 
 /* KEYMAP KEY TO HID KEYCODE*/
 uint8_t KEYMAP_NORMAL_MODE[MAX_ROWS][MAX_COLS] = {
@@ -104,6 +106,8 @@ void setup()
 
     initializeState(prevState);
     initializeState(currentState);
+    isPrevStatePressed = 0;
+    isCurrentStatePressed = 0;
 
     // setup timer interrupt
     cli();
@@ -123,21 +127,27 @@ void loop()
 
     for (int row = 0; row < MAX_ROWS; row++) {
         for (int col = 0; col < MAX_COLS; col++) {
-            readKey(row, col, currentState);
+            if (readKey(row, col, currentState)) {
+                isCurrentStatePressed = 0;
+            }
         }
     }
-    
+
     // Check if some keyes are pressed currently
-    if (isAnyKeyPressed(currentState)) {
+    if (isCurrentStatePressed) {
         sendKeyCodes(currentState);
 
     // Check if some keyes were pressed previously
     // and no key is pressed currently
-    } else if (isAnyKeyPressed(prevState)) {
+    } else if (isPrevStatePressed) {
         sendKeyCodes(zeroState);
     }
 
-    copyKeyState(currentState, prevState);
+    if (isPrevStatePressed || isCurrentStatePressed) {
+        copyKeyState(currentState, prevState);
+    }
+
+    isPrevStatePressed = isCurrentStatePressed;
 
     unsigned long scanEnd = millis();
 
@@ -167,8 +177,10 @@ void initializeState(uint8_t state[MAX_ROWS][MAX_COLS])
     }
 }
 
-void readKey(int row, int col, uint8_t state[MAX_ROWS][MAX_COLS])
+int readKey(int row, int col, uint8_t state[MAX_ROWS][MAX_COLS])
 {
+    int isKeyPressed = 0;
+
     // select row
     selectMux(row, muxRowControlPin);
 
@@ -185,11 +197,14 @@ void readKey(int row, int col, uint8_t state[MAX_ROWS][MAX_COLS])
         Serial.println(") ON");
 #endif
         state[row][col] = STATE_ON;
+        isKeyPressed = 1;
     } else {
         state[row][col] = STATE_OFF;
     }
 
     disableSelectedColumn();
+
+    return isKeyPressed;
 }
 
 void selectMux(int channel, int* controlPin)
@@ -220,16 +235,6 @@ int copyKeyState(uint8_t from[MAX_ROWS][MAX_COLS],
             to[row][col] = from[row][col];
         }
     }
-}
-
-int isAnyKeyPressed(uint8_t state[MAX_ROWS][MAX_COLS])
-{
-    for (int row = 0; row < MAX_ROWS; row++) {
-        for (int col = 0; col < MAX_COLS; col++) {
-            if (state[row][col] == STATE_ON) return 1;
-        }
-    }
-    return 0;
 }
 
 uint8_t keymapKeyToHidKeycode(int row, int col)
