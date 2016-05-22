@@ -250,6 +250,10 @@ void sendKeyCodes(uint8_t state[MAX_ROWS][MAX_COLS])
     int numOfKeyDown = 0;
     int hidKeycode;
 
+    if (state == zeroState) {
+        goto SENDKEY;
+    }
+
     // check FnKey(5, 4) is pressed
     if (state[5][4] == STATE_ON) {
         fnFlag = 1;
@@ -281,6 +285,7 @@ void sendKeyCodes(uint8_t state[MAX_ROWS][MAX_COLS])
     showSendingKeyCodes(modifiers, keyCodes);
 #endif
 
+SENDKEY:
     sendKeyCodesBySerial(modifiers,
                          keyCodes[0],
                          keyCodes[1],
