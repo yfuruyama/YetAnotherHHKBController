@@ -153,7 +153,8 @@ void loop()
 
     // adjust scan rate to SCAN_RATE
     if ((scanEnd - scanStart) < SCAN_RATE) {
-        /* delay(SCAN_RATE - (scanEnd - scanStart)); */
+        //delay(SCAN_RATE - (scanEnd - scanStart));
+        enterSleep();
         enterSleep();
     }
 }
@@ -227,7 +228,7 @@ void disableSelectedColumn()
     delayMicroseconds(5);
 }
 
-int copyKeyState(uint8_t from[MAX_ROWS][MAX_COLS],
+void copyKeyState(uint8_t from[MAX_ROWS][MAX_COLS],
                  uint8_t to[MAX_ROWS][MAX_COLS])
 {
     for (int row = 0; row < MAX_ROWS; row++) {
