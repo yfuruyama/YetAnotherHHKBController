@@ -125,10 +125,11 @@ void loop()
 {
     unsigned long scanStart = millis();
 
+    isCurrentStatePressed = 0;
     for (int row = 0; row < MAX_ROWS; row++) {
         for (int col = 0; col < MAX_COLS; col++) {
             if (readKey(row, col, currentState)) {
-                isCurrentStatePressed = 0;
+                isCurrentStatePressed = 1;
             }
         }
     }
@@ -153,9 +154,9 @@ void loop()
 
     // adjust scan rate to SCAN_RATE
     if ((scanEnd - scanStart) < SCAN_RATE) {
-        //delay(SCAN_RATE - (scanEnd - scanStart));
-        enterSleep();
-        enterSleep();
+        delay(SCAN_RATE - (scanEnd - scanStart));
+        //enterSleep();
+        //enterSleep();
     }
 }
 
