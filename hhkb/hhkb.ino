@@ -23,7 +23,7 @@
 #define STATE_ON 0x01
 #define STATE_OFF 0x00
 #define SCAN_RATE 15
-#define MAX_IGNORE_REPEATED_STATE_COUNT 5
+#define IGNORE_REPEATED_KEY_COUNT 5
 #define BT_MODE // Bluetooth Mode
 //#define DEBUG
 
@@ -49,7 +49,7 @@ uint8_t zeroState[MAX_ROWS][MAX_COLS] = {0};
 uint8_t currState[MAX_ROWS][MAX_COLS];
 int prevStateDigest;
 int currStateDigest;
-int stateRepeatCount;
+int repeatCount;
 
 /* KEYMAP KEY TO HID KEYCODE*/
 uint8_t KEYMAP_NORMAL_MODE[MAX_ROWS][MAX_COLS] = {
@@ -121,31 +121,31 @@ void setup()
     sei();
 }
 
-/* Scan Keyboard Matrix */
 void loop()
 {
     unsigned long scanStart = millis();
 
+    // Scan all keys
     currStateDigest = 0;
     for (int row = 0; row < MAX_ROWS; row++) {
         for (int col = 0; col < MAX_COLS; col++) {
             if (readKey(row, col, currState)) {
+                // NOTE: This is just digest value, not accurate one.
                 currStateDigest += row * MAX_COLS + col + 1;
             }
         }
     }
 
-    // Check if some keyes are pressed currently
     if (currStateDigest != 0) {
-        if ((prevStateDigest == currStateDigest) && stateRepeatCount < MAX_IGNORE_REPEATED_STATE_COUNT) {
-            stateRepeatCount++;
+        if ((prevStateDigest == currStateDigest) && repeatCount < IGNORE_REPEATED_KEY_COUNT) {
+            // Detect key repeat, so just count up
+            repeatCount++;
         } else {
-            stateRepeatCount = 0;
+            repeatCount = 0;
             sendKeyCodes(currState);
         }
-    // Check if some keyes were pressed previously
-    // and no key is pressed currently
     } else if (prevStateDigest != 0) {
+        // Key up
         sendKeyCodes(zeroState);
     }
 
@@ -153,10 +153,9 @@ void loop()
 
     unsigned long scanEnd = millis();
 
-    // adjust scan rate to SCAN_RATE
+    // adjust scan rate
     if ((scanEnd - scanStart) < SCAN_RATE) {
         delay(SCAN_RATE - (scanEnd - scanStart));
-        //enterSleep();
         //enterSleep();
     }
 }
