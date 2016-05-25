@@ -23,6 +23,7 @@
 #define STATE_ON 0x01
 #define STATE_OFF 0x00
 #define SCAN_RATE 15
+#define MAX_IGNORE_REPEATED_STATE_COUNT 5
 #define BT_MODE // Bluetooth Mode
 //#define DEBUG
 
@@ -45,13 +46,10 @@ int muxChannel[8][3] = {
 };
 
 uint8_t zeroState[MAX_ROWS][MAX_COLS] = {0};
-uint8_t state1[MAX_ROWS][MAX_COLS];
-uint8_t state2[MAX_ROWS][MAX_COLS];
-uint8_t (*prevState)[MAX_COLS];
-uint8_t (*currState)[MAX_COLS];
-uint8_t (*tmpState)[MAX_COLS];
-int isPrevStatePressed;
-int isCurrentStatePressed;
+uint8_t currState[MAX_ROWS][MAX_COLS];
+int prevStateDigest;
+int currStateDigest;
+int stateRepeatCount;
 
 /* KEYMAP KEY TO HID KEYCODE*/
 uint8_t KEYMAP_NORMAL_MODE[MAX_ROWS][MAX_COLS] = {
@@ -107,12 +105,10 @@ void setup()
     }
     digitalWrite(enableColPin, COL_DISABLE);
 
-    initializeState(state1);
-    initializeState(state2);
-    prevState = state1;
-    currState = state2;
-    isPrevStatePressed = 0;
-    isCurrentStatePressed = 0;
+    initializeState(currState);
+    prevStateDigest = 0;
+    currStateDigest = 0;
+    stateRepeatCount = 0;
 
     // setup timer interrupt
     cli();
@@ -130,31 +126,30 @@ void loop()
 {
     unsigned long scanStart = millis();
 
-    isCurrentStatePressed = 0;
+    currStateDigest = 0;
     for (int row = 0; row < MAX_ROWS; row++) {
         for (int col = 0; col < MAX_COLS; col++) {
             if (readKey(row, col, currState)) {
-                isCurrentStatePressed = 1;
+                currStateDigest += row * MAX_COLS + col + 1;
             }
         }
     }
 
     // Check if some keyes are pressed currently
-    if (isCurrentStatePressed) {
-        sendKeyCodes(currState);
-
+    if (currStateDigest != 0) {
+        if ((prevStateDigest == currStateDigest) && stateRepeatCount < MAX_IGNORE_REPEATED_STATE_COUNT) {
+            stateRepeatCount++;
+        } else {
+            stateRepeatCount = 0;
+            sendKeyCodes(currState);
+        }
     // Check if some keyes were pressed previously
     // and no key is pressed currently
-    } else if (isPrevStatePressed) {
+    } else if (prevStateDigest != 0) {
         sendKeyCodes(zeroState);
     }
 
-    // swap states
-    tmpState = prevState;
-    prevState = currState;
-    currState = tmpState;
-
-    isPrevStatePressed = isCurrentStatePressed;
+    prevStateDigest = currStateDigest;
 
     unsigned long scanEnd = millis();
 
