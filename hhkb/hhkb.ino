@@ -45,8 +45,11 @@ int muxChannel[8][3] = {
 };
 
 uint8_t zeroState[MAX_ROWS][MAX_COLS] = {0};
-uint8_t prevState[MAX_ROWS][MAX_COLS];
-uint8_t currentState[MAX_ROWS][MAX_COLS];
+uint8_t state1[MAX_ROWS][MAX_COLS];
+uint8_t state2[MAX_ROWS][MAX_COLS];
+uint8_t (*prevState)[MAX_COLS];
+uint8_t (*currState)[MAX_COLS];
+uint8_t (*tmpState)[MAX_COLS];
 int isPrevStatePressed;
 int isCurrentStatePressed;
 
@@ -104,8 +107,10 @@ void setup()
     }
     digitalWrite(enableColPin, COL_DISABLE);
 
-    initializeState(prevState);
-    initializeState(currentState);
+    initializeState(state1);
+    initializeState(state2);
+    prevState = state1;
+    currState = state2;
     isPrevStatePressed = 0;
     isCurrentStatePressed = 0;
 
@@ -128,7 +133,7 @@ void loop()
     isCurrentStatePressed = 0;
     for (int row = 0; row < MAX_ROWS; row++) {
         for (int col = 0; col < MAX_COLS; col++) {
-            if (readKey(row, col, currentState)) {
+            if (readKey(row, col, currState)) {
                 isCurrentStatePressed = 1;
             }
         }
@@ -136,7 +141,7 @@ void loop()
 
     // Check if some keyes are pressed currently
     if (isCurrentStatePressed) {
-        sendKeyCodes(currentState);
+        sendKeyCodes(currState);
 
     // Check if some keyes were pressed previously
     // and no key is pressed currently
@@ -144,9 +149,10 @@ void loop()
         sendKeyCodes(zeroState);
     }
 
-    if (isPrevStatePressed || isCurrentStatePressed) {
-        copyKeyState(currentState, prevState);
-    }
+    // swap states
+    tmpState = prevState;
+    prevState = currState;
+    currState = tmpState;
 
     isPrevStatePressed = isCurrentStatePressed;
 
@@ -227,15 +233,6 @@ void disableSelectedColumn()
 {
     digitalWrite(enableColPin, COL_DISABLE);
     delayMicroseconds(5);
-}
-
-void copyKeyState(uint8_t from[MAX_ROWS][MAX_COLS], uint8_t to[MAX_ROWS][MAX_COLS])
-{
-    for (int row = 0; row < MAX_ROWS; row++) {
-        for (int col = 0; col < MAX_COLS; col++) {
-            to[row][col] = from[row][col];
-        }
-    }
 }
 
 uint8_t keymapKeyToHidKeycode(int row, int col)
