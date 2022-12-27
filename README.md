@@ -4,7 +4,7 @@ YetAnotherHHKBController
 Yet another controller for Happy Hacking Keyboard Professional2.  
 This controller is designed for Arduino.
 
-![screenshot](https://raw.github.com/addsict/YetAnotherHHKBController/master/img/hhkb_arduino.png)
+![screenshot](https://raw.github.com/yfuruyama/YetAnotherHHKBController/master/img/hhkb_arduino.png)
 
 !DISCLAIMER!
 ---------------
@@ -15,6 +15,6 @@ I'm not accountable for the damage or detriment caused by using this software.
 
 References
 ----------
-- My blog post(Japanese)
+- My blog posts (Japanese)
   - http://addsict.hatenablog.com/entry/2013/07/27/164647
   - http://addsict.hatenablog.com/entry/2013/08/18/170204
